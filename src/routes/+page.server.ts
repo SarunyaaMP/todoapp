@@ -1,24 +1,49 @@
-import type { Actions, PageServerLoad} from "./$types";
+import type { Actions, PageServerLoad , PageData} from "./$types";
 import  prisma  from "$lib/server/prisma"
-import { fail } from "@sveltejs/kit";
+import { fail, redirect } from "@sveltejs/kit";
 
-export const load: PageServerLoad = async() => {
+export const load: PageServerLoad = async( {locals} ) => {
+
+    const session = await locals.auth();
+    // console.log('session', session);
+    
     return{
-        todos: await prisma.todo.findMany()
+        todos: await prisma.todo.findMany(),
+        session: session
     }
 }
-
+ 
 export const actions : Actions = {
-    createTodo : async ( { request }) => {
+    createTodo : async ( { request , locals}) => {
+
+        const session = await locals.auth();
+
+        if(!session) {
+            console.log('No session found!');
+        }
+
         const data = await request.formData();
-        const {text} = Object.fromEntries(data) as {
-            text : string
+
+        // console.log(data);
+
+        const {text , image} = Object.fromEntries(data) as {
+            text : string,
+            image : string
         }
 
         try{
+
+            const prismaUser = await prisma.user.findUnique({
+                where: {
+                    email : session?.user?.email as string
+                }
+            })
+
             await prisma.todo.create({
                 data : {
-                    text
+                    text,
+                    image,
+                    userId: prismaUser?.id
                 }
             })
         }
@@ -57,44 +82,5 @@ export const actions : Actions = {
             status: 200
         }
     },
-
-    toggleTodo: async( { url }) => {
-        console.log("toggling data");
-        const id = url.searchParams.get("id");
-
-        if(!id){
-            return fail(400, { message: "Invalid request"})
-        }
-
-        try{
-            const data = await prisma.todo.findUnique({
-                where: {
-                    id: Number(id)
-                }
-            });
-            
-
-            if( data?.completed != null){
-                await prisma.todo.update({
-                    where : {
-                        id: Number(id)
-                    },
-                    data : {
-                        completed : {
-                            set : !data.completed
-                        }
-                    }
-                })
-            }
-        }
-
-        catch(error){
-            console.error(error);
-            return fail(500, {message : 'Something went wrong in toggle '})
-        }
-
-        return{
-            status: 200
-        }
-    }
 }
+
