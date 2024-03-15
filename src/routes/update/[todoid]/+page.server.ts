@@ -2,6 +2,10 @@ import type { Actions, PageServerLoad } from "./$types";
 import prisma from "$lib/server/prisma";
 import { error, fail } from "@sveltejs/kit";
 
+export const config = {
+    runtime: 'edge',
+};
+
 export const load : PageServerLoad = async ( { params: {todoid}}) => {
 
     const todo = await prisma.todo.findUnique({
