@@ -10,7 +10,7 @@ export const load: PageServerLoad = async( {locals} ) => {
 
     const session = await locals.auth();
     // console.log('session', session);
-    
+
     return{
         todos: await prisma.todo.findMany(),
         session: session
