@@ -6,6 +6,7 @@ import { fail, redirect } from "@sveltejs/kit";
 //     runtime: 'edge',
 // };
 
+export const prerender = true;
 export const load: PageServerLoad = async( {locals} ) => {
 
     const session = await locals.auth();
