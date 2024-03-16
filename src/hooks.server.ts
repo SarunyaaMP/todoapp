@@ -13,5 +13,5 @@ export const { handle , signIn , signOut} = SvelteKitAuth({
     ]
 })
 
-console.log("On hooks.server.ts",handle.name);
+// console.log("On hooks.server.ts",handle.name);
 
