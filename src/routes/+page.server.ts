@@ -12,7 +12,11 @@ export const load: PageServerLoad = async( {locals} ) => {
     // console.log('session', session);
 
     return{
-        todos: await prisma.todo.findMany(),
+        todos: await prisma.todo.findMany({
+            include : {
+                user : true
+            }
+        }),
         session: session
     }
 }
