@@ -2,9 +2,9 @@
 // load -> load serverside any data we need
 import type { LayoutServerLoad } from "./$types";
 
-// export const config = {
-//     runtime: 'edge',
-// };
+export const config = {
+    runtime: 'edge',
+};
 
 export const load : LayoutServerLoad = async (event) => {
     return {

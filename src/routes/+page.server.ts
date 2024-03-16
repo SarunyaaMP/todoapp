@@ -2,9 +2,9 @@ import type { Actions, PageServerLoad , PageData} from "./$types";
 import  prisma  from "$lib/server/prisma"
 import { fail, redirect } from "@sveltejs/kit";
 
-// export const config = {
-//     runtime: 'edge',
-// };
+export const config = {
+    runtime: 'edge',
+};
 
 export const load: PageServerLoad = async( {locals} ) => {
 
