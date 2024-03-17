@@ -1,6 +1,7 @@
 import type { Actions, PageServerLoad , PageData} from "./$types";
 import  prisma  from "$lib/server/prisma"
 import { fail, redirect } from "@sveltejs/kit";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export const config = {
     runtime: 'edge',
@@ -12,12 +13,25 @@ export const load: PageServerLoad = async( {locals} ) => {
     const session = await locals.auth();
     // console.log('session', session);
 
-    return{
-        todos: await prisma.todo.findMany({
+    let todos;
+    try{
+        todos = await prisma.todo.findMany({
             include : {
                 user : true
             }
-        }),
+        })
+    }
+
+    catch(error){
+        console.log(error);
+        if(error instanceof PrismaClientKnownRequestError){
+            return fail(500, {message : 'PrismaClientKnownRequestError logged'})
+        }
+    }
+
+
+    return{
+        todos: todos,
         session: session
     }
 }
